@@ -3,7 +3,7 @@ package Entidades;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class SegurosDAO {
     private Conexion conexion;
@@ -55,14 +55,15 @@ public class SegurosDAO {
             conexion.cerrarConexion();
         }
     }
-    public List<seguros> listarSeguros() {
-        List<seguros> listaSeguros = new ArrayList<>();
+    public ArrayList<seguros> listarSeguros() {
+        ArrayList<seguros> listaSeguros = new ArrayList<>();
         try {
-        	conexion.setearConsulta("SELECT s.idSeguro, s.descripcion AS descripcionSeguro,s.idTipo as IdT, t.descripcion AS descripcionTipo, s.CostoContratacion as costoContratacion, s.CostoAsegurado as costoAsegurado FROM seguros JOIN tiposeguros t ON s.idTipo = t.idTipo;"); 
+        	conexion.setearConsulta("SELECT s.idSeguro, s.descripcion AS descripcionSeguro,s.idTipo as IdT, t.descripcion AS descripcionTipo, s.CostoContratacion as costoContratacion, s.CostoAsegurado as costoAsegurado FROM seguros s JOIN tiposeguros t ON s.idTipo = t.idTipo;"); 
         	
             conexion.ejecutarLectura();
             while (conexion.getLector().next()) {
                 seguros seguro = new seguros();
+                seguro.setidSeguro(conexion.getLector().getInt("idSeguro"));             
                 seguro.setDescripcion(conexion.getLector().getString("descripcionSeguro"));
                 tipoSeguros tipo = new tipoSeguros();
                 tipo.setDescripcion(conexion.getLector().getString("descripcionTipo"));
@@ -79,10 +80,11 @@ public class SegurosDAO {
         }
         return listaSeguros;
     }
+    
     public ArrayList<seguros> filtrarSeguros(String tipo1) {
         ArrayList<seguros> listaSeguros = new ArrayList<>();
         try {
-        	conexion.setearConsulta("SELECT s.idSeguro , s.descripcion AS descripcionSeguro,s.idTipo as IdT, t.descripcion AS descripcionTipo, s.CostoContratacion as costoContratacion, s.CostoAsegurado as costoAsegurado FROM seguros s JOIN tiposeguros t ON s.idTipo = t.idTipo and t.descripcion ="+ "'tipo1'"); 
+        	conexion.setearConsulta("SELECT s.idSeguro , s.descripcion AS descripcionSeguro,s.idTipo as IdT, t.descripcion AS descripcionTipo, s.CostoContratacion as costoContratacion, s.CostoAsegurado as costoAsegurado FROM seguros s JOIN tiposeguros t ON s.idTipo = t.idTipo and t.descripcion ='"+ tipo1 +"'"); 
         	
             conexion.ejecutarLectura();
             while (conexion.getLector().next()) {

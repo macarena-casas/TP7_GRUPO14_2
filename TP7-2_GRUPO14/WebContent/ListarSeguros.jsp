@@ -12,28 +12,37 @@
 	<nav>
 		<a href="Inicio.jsp">Inicio</a>
 		<a href="AgregarSeguro.jsp">Agregar seguro</a>
-		<a href="ListarSeguros.jsp">Listar seguros</a>
+		<a href="ServletSeguros?param=1">Listar seguros</a>
 	</nav>
 	<h1>"Tipo de seguros de la base de datos"</h1>
+
+  
+	
 	 <form action = "ServletSeguros" method="post">
-       
-    <%
+     <%
+	//ArrayList <seguros> listacompleta =null;
+    //SegurosDAO seg1 = new SegurosDAO();
+    //listacompleta = seg1.listarSeguros();
     SegurosDAO seg = new SegurosDAO();
     ArrayList <tipoSeguros> tipos = seg.tipos();
 %>
 	<label>Busqueda por tipo de Seguros: </label>
 	<select name="filtroTipoSeguros"> 
-	  <% for (tipoSeguros tipo : tipos) { %>
+	
+	  <% if( tipos !=null)
+	  for (tipoSeguros tipo : tipos) { %>
             <option value="<%= tipo %>"><%= tipo %></option>
         <% } %>
         </select>
-		</form>
 	<input type="submit" name="btnFiltro" value="Filtrar">
+		</form>
 		
 	<%
+
 	ArrayList <seguros> lista = null ;
+	//lista=listacompleta;
 	if(request.getAttribute("listaS") != null ){
-	lista = (ArrayList <seguros>)request.getAttribute("listaS");	
+	lista = (ArrayList<seguros>)request.getAttribute("listaS");
 	}
 	
 	%>
@@ -46,11 +55,11 @@
 for( seguros segu: lista ){%>
 
 <tr>
-<td> <%segu.getIdSeguro();%> </td>
-<td><%segu.getDescripcion();%></td>
-<td><%segu.getIdTipo().getDescripcion();%></td>
-<td> <%segu.getCostoContratacion();%></td>
-<td><%segu.getCostoAsegurado();%></td>          
+<td> <%=segu.getIdSeguro()%> </td>
+<td><%=segu.getDescripcion()%></td>
+<td><%=segu.getIdTipo().getDescripcion()%></td>
+<td> <%=segu.getCostoContratacion()%></td>
+<td><%=segu.getCostoAsegurado()%></td>          
 </tr>
 <%}} %>
 	</table>

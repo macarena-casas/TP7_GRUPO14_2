@@ -71,6 +71,8 @@ public class Conexion {
     public void setearParametros(int index, String str) throws SQLException {
         comando.setObject(index, str);
     }
+   
+    
     
     public int ejecutarAccion() throws SQLException {
         int filasAfectadas = 0;

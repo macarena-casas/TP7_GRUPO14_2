@@ -5,7 +5,7 @@ import Entidades.tipoSeguros;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -27,7 +27,21 @@ public class ServletSeguros extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		if (request.getParameter("param") != null) {
+			SegurosDAO dao = new SegurosDAO();
+			
+		    ArrayList <seguros> lista =dao.listarSeguros();
+			 
+	           request.setAttribute("listaS",lista);
+		 
+		 RequestDispatcher rd=request.getRequestDispatcher("/ListarSeguros.jsp");  
+		    rd.forward(request, response);
+			
+		}
+			
+		//////lista los seguros 
+		
+		
 	    if (request.getParameter("btnAceptar") != null) {
 	        try {
 	            seguros s = new seguros();
@@ -88,9 +102,12 @@ public class ServletSeguros extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		 if (request.getParameter("btnFiltro") != null) {
-			 
-		     SegurosDAO dao = new SegurosDAO();
+	
+		
+		if (request.getParameter("btnFiltro") != null) {
+			SegurosDAO dao = new SegurosDAO();
+
+		     
 		     String tipoSeguroSeleccionado = request.getParameter("filtroTipoSeguros");
 	           ArrayList <seguros> lista =dao.filtrarSeguros(tipoSeguroSeleccionado);
 			 
