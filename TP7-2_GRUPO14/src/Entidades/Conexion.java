@@ -5,24 +5,34 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
 public class Conexion {
     private Connection conexion;
     private PreparedStatement comando;
     private ResultSet lector;
+    private String url = "jdbc:mysql://localhost:3306/segurosgroup2";
+    private String user = "root"; 
+    private String password = "root";
+    public static Conexion instancia;
+   
+
     public ResultSet getLector() {
         return lector;
     }
     
     public Conexion() {
-        try {
-            String url = "jdbc:mysql://localhost:3306/segurosgroup"; 
-            String user = "root"; 
-            String password = ""; 
-            conexion = DriverManager.getConnection(url, user, password);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        try {  
+        
+                this.conexion = DriverManager.getConnection(url, user, password);
+                this.conexion.setAutoCommit(false);
+               
+            } 
+        catch (SQLException ex) {
+                ex.printStackTrace();
+            } 
+   
         }
-    }
+            
    
     public void setearSp(String sp) throws SQLException {
         comando = conexion.prepareStatement("{call " + sp + "}");

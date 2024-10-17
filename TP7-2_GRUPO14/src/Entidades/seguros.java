@@ -3,7 +3,7 @@ package Entidades;
 import Entidades.tipoSeguros;
 
 public class seguros {
-    private static int contadorIdSeguro = 0;
+    private  int contadorIdSeguro = 0;
     private int idSeguro;
     private String descripcion;
     private tipoSeguros idTipo;
@@ -11,8 +11,9 @@ public class seguros {
     private float costoAsegurado;
     
 
-    public seguros(String descripcion, tipoSeguros idTipo, float costoContratacion, float costoAsegurado) {
-        this.idSeguro = contadorIdSeguro++; 
+    public seguros(int id, String descripcion, tipoSeguros idTipo, float costoContratacion, float costoAsegurado) {
+       
+    	this.idSeguro = id; 
         this.descripcion = descripcion;
         this.idTipo = idTipo;
         this.costoContratacion = costoContratacion;
@@ -28,7 +29,9 @@ public class seguros {
         this.costoAsegurado = -1;
     }
 
-
+    public void setidSeguro(int id) {
+        this.idSeguro = id;
+    }
     public int getIdSeguro() {
         return idSeguro;
     }
