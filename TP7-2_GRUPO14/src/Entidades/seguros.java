@@ -3,66 +3,68 @@ package Entidades;
 import Entidades.tipoSeguros;
 
 public class seguros {
-	private int idSeguro;
-	private String descripcion;
-	private tipoSeguros idTipo;
-	private float costoContratacion;
-	private float costoAsegurado;
-	
-	public seguros(int idSeguro, String descripcion, tipoSeguros idTipo, float costoContratacion,
-			float costoAsegurado) {
-		this.idSeguro = idSeguro;
-		this.descripcion = descripcion;
-		this.idTipo = idTipo;
-		this.costoContratacion = costoContratacion;
-		this.costoAsegurado = costoAsegurado;
-	}
-	
-	public seguros() {
-		this.idSeguro = -1;
-		this.descripcion = "";
-		this.idTipo = new tipoSeguros();
-		this.costoContratacion = -1;
-		this.costoAsegurado = -1;
-	}
+    private static int contadorIdSeguro = 0;
+    private int idSeguro;
+    private String descripcion;
+    private tipoSeguros idTipo;
+    private float costoContratacion;
+    private float costoAsegurado;
+    
 
-	public int getIdSeguro() {
-		return idSeguro;
-	}
+    public seguros(String descripcion, tipoSeguros idTipo, float costoContratacion, float costoAsegurado) {
+        this.idSeguro = contadorIdSeguro++; 
+        this.descripcion = descripcion;
+        this.idTipo = idTipo;
+        this.costoContratacion = costoContratacion;
+        this.costoAsegurado = costoAsegurado;
+    }
+    
 
-	public void setIdSeguro(int idSeguro) {
-		this.idSeguro = idSeguro;
-	}
+    public seguros() {
+        this.idSeguro = contadorIdSeguro++; 
+        this.descripcion = "";
+        this.idTipo = new tipoSeguros();
+        this.costoContratacion = -1;
+        this.costoAsegurado = -1;
+    }
 
-	public String getDescripcion() {
-		return descripcion;
-	}
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
+    public int getIdSeguro() {
+        return idSeguro;
+    }
 
-	public tipoSeguros getIdTipo() {
-		return idTipo;
-	}
+    
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-	public void setIdTipo(tipoSeguros idTipo) {
-		this.idTipo = idTipo;
-	}
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
-	public float getCostoContratacion() {
-		return costoContratacion;
-	}
+    public tipoSeguros getIdTipo() {
+        return idTipo;
+    }
 
-	public void setCostoContratacion(float costoContratacion) {
-		this.costoContratacion = costoContratacion;
-	}
+    public void setIdTipo(tipoSeguros idTipo) {
+        this.idTipo = idTipo;
+    }
 
-	public float getCostoAsegurado() {
-		return costoAsegurado;
-	}
+    public float getCostoContratacion() {
+        return costoContratacion;
+    }
 
-	public void setCostoAsegurado(float costoAsegurado) {
-		this.costoAsegurado = costoAsegurado;
-	}
+    public void setCostoContratacion(float costoContratacion) {
+        this.costoContratacion = costoContratacion;
+    }
+
+    public float getCostoAsegurado() {
+        return costoAsegurado;
+    }
+
+    public void setCostoAsegurado(float costoAsegurado) {
+        this.costoAsegurado = costoAsegurado;
+    }
+    
+    
 }
