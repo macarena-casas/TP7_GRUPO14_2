@@ -1,11 +1,12 @@
 package Servlets;
+
 import Entidades.SegurosDAO;
 import Entidades.seguros;
 import Entidades.tipoSeguros;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
-
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -14,107 +15,143 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 @WebServlet("/ServletSeguros")
 public class ServletSeguros extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public ServletSeguros() {
         super();
-      
-        
-        
     }
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (request.getParameter("param") != null) {
-			SegurosDAO dao = new SegurosDAO();
-			
-		    ArrayList <seguros> lista =dao.listarSeguros();
-			 
-	           request.setAttribute("listaS",lista);
-		 
-		 RequestDispatcher rd=request.getRequestDispatcher("/ListarSeguros.jsp");  
-		    rd.forward(request, response);
-			
-		}
-			
-		//////lista los seguros 
-		
-		
-	    if (request.getParameter("btnAceptar") != null) {
-	        try {
-	            seguros s = new seguros();
-	            request.setAttribute("IdProximo",s.getIdSeguro());
-	           
-	            
-	           //intentos para validaciones
-	           /* if (request.getParameter("txtDescripcion") != null ) {
-	            	s.setDescripcion(request.getParameter("txtDescripcion"));
-	            } else {
-	             
-	                request.setAttribute("error", "Debe completar la descripcion.");
-	            }
-	            */
-	           s.setDescripcion(request.getParameter("txtDescripcion"));
-	            
-	            String tipoSeguroSeleccionado = request.getParameter("seguro");
-	            tipoSeguros tipoSeguro = null;
-	            if ("Salud".equals(tipoSeguroSeleccionado)) {
-	                tipoSeguro = new tipoSeguros(1, "Salud");
-	            } else if ("Automóvil".equals(tipoSeguroSeleccionado)) {
-	                tipoSeguro = new tipoSeguros(2, "Automóvil");
-	            } else if ("Hogar".equals(tipoSeguroSeleccionado)) {
-	                tipoSeguro = new tipoSeguros(3, "Hogar");
-	            } else if ("Vida".equals(tipoSeguroSeleccionado)) {
-	                tipoSeguro = new tipoSeguros(4, "Vida");
-	            }
-	            s.setIdTipo(tipoSeguro);
-	            //intentos para validaciones
-	           /* if (request.getParameter("txtCosto") != null && request.getParameter("txtCosto").matches("\\d+(\\.\\d+)?")) {
-	                s.setCostoContratacion(Float.parseFloat(request.getParameter("txtCosto")));
-	            } else {
-	             
-	                request.setAttribute("error", "El costo debe ser un número válido.");
-	            }
-	            if (request.getParameter("txtCostoMaximo") != null && request.getParameter("txtCostoMaximo").matches("\\d+(\\.\\d+)?")) {
-	                s.setCostoContratacion(Float.parseFloat(request.getParameter("txtCostoMaximo")));
-	            } else {
-	             
-	                request.setAttribute("error", "El costo debe ser un número válido.");
-	            }*/
-	            s.setCostoContratacion(Float.parseFloat(request.getParameter("txtCosto")));
-	           s.setCostoAsegurado(Float.parseFloat(request.getParameter("txtCostoMaximo")));
-	            SegurosDAO dao = new SegurosDAO();
-	            dao.agregarSeguro(s);
-	            
-	            System.out.println("<p>Seguro agregado exitosamente!</p>");
-	        } 
-	        catch (Exception e) {
-	            e.printStackTrace();
-	            System.out.println("<p>No fue agregado</p>");
-	        }
-	    }
-	    
-	    RequestDispatcher rd=request.getRequestDispatcher("/AgregarSeguro.jsp");  
-	    rd.forward(request, response);
-	    
-	}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        SegurosDAO dao = new SegurosDAO(); 
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-		
-		if (request.getParameter("btnFiltro") != null) {
-			SegurosDAO dao = new SegurosDAO();
+        
+        if (request.getParameter("param") == null) {
+            System.out.println("Parametro 'param' es nulo, redirigiendo a AgregarSeguro.jsp.");
+            
+            try {
+                request.setAttribute("IdProximo", dao.obtenerProximoId());
+                ArrayList<tipoSeguros> listaTiposSeguros = dao.listarTiposSeguros();
+                request.setAttribute("listaTiposSeguros", listaTiposSeguros);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                request.setAttribute("error", "Error al obtener los tipos de seguros.");
+            }
 
-		     
-		     String tipoSeguroSeleccionado = request.getParameter("filtroTipoSeguros");
-	           ArrayList <seguros> lista =dao.filtrarSeguros(tipoSeguroSeleccionado);
-			 
-	           request.setAttribute("listaS",lista);
-		 
-		 RequestDispatcher rd=request.getRequestDispatcher("/ListarSeguros.jsp");  
-		    rd.forward(request, response);
-	}
-	}
+            RequestDispatcher rd = request.getRequestDispatcher("/AgregarSeguro.jsp");
+            rd.forward(request, response);
+            return; 
+        }
+
+       
+        if (request.getParameter("param") != null) {
+            System.out.println("Parametro 'param' no es nulo, listando seguros...");
+            ArrayList<seguros> lista = dao.listarSeguros();
+			request.setAttribute("listaS", lista);
+
+            RequestDispatcher rd = request.getRequestDispatcher("/ListarSeguros.jsp");
+            rd.forward(request, response);
+            return; 
+        }
+    }
+
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+       
+        if (request.getParameter("btnFiltro") != null) {
+            System.out.println("Botón de filtro presionado.");
+            SegurosDAO dao = new SegurosDAO();
+            String tipoSeguroSeleccionado = request.getParameter("filtroTipoSeguros");
+            
+           
+            ArrayList<seguros> lista = null;
+			lista = dao.filtrarSeguros(tipoSeguroSeleccionado);
+            request.setAttribute("listaS", lista);
+            
+            
+            RequestDispatcher rd = request.getRequestDispatcher("/ListarSeguros.jsp");
+            rd.forward(request, response);
+            return;
+        }
+
+       
+        System.out.println("btnAceptar: " + request.getParameter("btnAceptar"));
+        System.out.println("txtDescripcion: " + request.getParameter("txtDescripcion"));
+        System.out.println("seguro: " + request.getParameter("seguro"));
+        System.out.println("txtCosto: " + request.getParameter("txtCosto"));
+        System.out.println("txtCostoMaximo: " + request.getParameter("txtCostoMaximo"));
+
+        
+        if (request.getParameter("btnAceptar") != null) {
+            System.out.println("Botón 'btnAceptar' presionado, validando datos...");
+            try {
+                boolean esValido = true;  
+                StringBuilder errorMsg = new StringBuilder();  
+
+                seguros s = new seguros();  
+
+                
+                String descripcion = request.getParameter("txtDescripcion");
+                if (descripcion == null || descripcion.trim().isEmpty()) {
+                    esValido = false;
+                    errorMsg.append("Debe completar la descripción.<br>");
+                } else {
+                    s.setDescripcion(descripcion);
+                }
+
+               
+                String tipoSeguroSeleccionado = request.getParameter("seguro");
+                if (tipoSeguroSeleccionado != null && !tipoSeguroSeleccionado.isEmpty()) {
+                    int idTipoSeguro = Integer.parseInt(tipoSeguroSeleccionado); 
+                    tipoSeguros tipoSeguro = new tipoSeguros();
+                    tipoSeguro.setIdTipo(idTipoSeguro);  
+                    s.setIdTipo(tipoSeguro);  
+                } else {
+                    esValido = false;
+                    errorMsg.append("Debe seleccionar un tipo de seguro.<br>");
+                }
+
+               
+                String costo = request.getParameter("txtCosto");
+                if (costo == null || !costo.matches("\\d+(\\.\\d+)?")) {
+                    esValido = false;
+                    errorMsg.append("El costo de contratación debe ser un número válido.<br>");
+                } else {
+                    s.setCostoContratacion(Float.parseFloat(costo));
+                }
+
+               
+                String costoMaximo = request.getParameter("txtCostoMaximo");
+                if (costoMaximo == null || !costoMaximo.matches("\\d+(\\.\\d+)?")) {
+                    esValido = false;
+                    errorMsg.append("El costo máximo asegurado debe ser un número válido.<br>");
+                } else {
+                    s.setCostoAsegurado(Float.parseFloat(costoMaximo));
+                }
+
+               
+                if (esValido) {
+                    System.out.println("Todos los campos son válidos, procediendo a agregar el seguro...");
+                    SegurosDAO dao = new SegurosDAO();
+                    dao.agregarSeguro(s);  
+                    request.setAttribute("mensajeExito", "Seguro agregado exitosamente.");
+                } else {
+                    
+                    System.out.println("Errores de validación: " + errorMsg.toString());
+                    request.setAttribute("error", errorMsg.toString());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace(); 
+                request.setAttribute("error", "Hubo un problema al agregar el seguro.");
+            }
+
+           
+            RequestDispatcher rd = request.getRequestDispatcher("/AgregarSeguro.jsp");
+            rd.forward(request, response);
+            return;
+        }
+    }
+
 }

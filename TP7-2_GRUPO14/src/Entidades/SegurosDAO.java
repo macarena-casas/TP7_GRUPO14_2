@@ -1,9 +1,10 @@
 package Entidades;
 
+
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 
 public class SegurosDAO {
     private Conexion conexion;
@@ -11,50 +12,36 @@ public class SegurosDAO {
     public SegurosDAO() {
         conexion = new Conexion();
     }
-     public ArrayList <tipoSeguros> tipos() {
-    try {
-        conexion.setearConsulta("select * from tipoSeguros");
-        ResultSet resultSet = conexion.ejecutarLectura();
-      
-        ArrayList<tipoSeguros> lista = new ArrayList <tipoSeguros>();
-        while (resultSet.next()) {
-        int id = Integer.parseInt(resultSet.getString("idTipo"));
-        String descripcion = resultSet.getString("descripcion");
-     
-        tipoSeguros tipo_seguro = new tipoSeguros();
-        tipo_seguro.setIdTipo(id); 
-        tipo_seguro.setDescripcion(descripcion);
-            lista.add(tipo_seguro);
+
+    public ArrayList<tipoSeguros> listarTiposSeguros() throws SQLException {
+        ArrayList<tipoSeguros> listaTiposSeguros = new ArrayList<>();
+        conexion.setearConsulta("SELECT idTipo, descripcion FROM tiposeguros");
+
+        try (ResultSet rs = conexion.ejecutarLectura()) {
+            while (rs.next()) {
+                tipoSeguros tipo = new tipoSeguros();
+                tipo.setIdTipo(rs.getInt("idTipo"));
+                tipo.setDescripcion(rs.getString("descripcion"));
+                listaTiposSeguros.add(tipo);
+            }
         }
-        return lista; 
+        System.out.println("Lista de seguros: " + listaTiposSeguros);
         
-        
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return null;
-    } finally {
-        conexion.cerrarConexion();
+        return listaTiposSeguros;
     }
-    }
-  
-    
-    public void agregarSeguro(seguros seguro) {
-        try {
-        	conexion.setearConsulta("INSERT INTO seguros (descripcion,idTipo,costoContratacion,costoAsegurado) VALUES (?,?,?,?,?)"); 
-        	
-            //conexion.setearSp("agregarSeguro(?, ?, ?, ?, ?)");
-            conexion.setearParametros(1, seguro.getDescripcion());  
-            conexion.setearParametros(2, String.valueOf(seguro.getIdSeguro()));
-            conexion.setearParametros(3, seguro.getIdTipo().getDescripcion()); 
-            conexion.setearParametros(4, String.valueOf(seguro.getCostoContratacion()));
-            conexion.setearParametros(5, String.valueOf(seguro.getCostoAsegurado()));
-            conexion.ejecutarAccion();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            conexion.cerrarConexion();
+
+    public int obtenerProximoId() throws SQLException {
+        int idProximo = -1;
+        conexion.setearConsulta("SELECT IFNULL(MAX(idSeguro) + 1, 1) AS proximoId FROM seguros;");
+
+        try (ResultSet rs = conexion.ejecutarLectura()) {
+            if (rs.next()) {
+                idProximo = rs.getInt("proximoId");
+            }
         }
+        return idProximo;
     }
+
     public ArrayList<seguros> listarSeguros() {
         ArrayList<seguros> listaSeguros = new ArrayList<>();
         try {
@@ -72,15 +59,49 @@ public class SegurosDAO {
                 seguro.setCostoContratacion(conexion.getLector().getFloat("costoContratacion"));
                 seguro.setCostoAsegurado(conexion.getLector().getFloat("costoAsegurado"));
                 listaSeguros.add(seguro);
+                
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             conexion.cerrarConexion();
         }
+        
         return listaSeguros;
     }
+
+    public void agregarSeguro(seguros seguro) {
+        try {
+            conexion.setearConsulta("INSERT INTO seguros (descripcion, idTipo, costoContratacion, costoAsegurado) VALUES (?, ?, ?, ?)");
+
+            
+            conexion.setearParametros(1, seguro.getDescripcion());
+            conexion.setearParametros(2, seguro.getIdTipo().getIdTipo()); 
+            conexion.setearParametros(3, seguro.getCostoContratacion()); 
+            conexion.setearParametros(4, seguro.getCostoAsegurado()); 
+
+         
+            int filasAfectadas = conexion.ejecutarAccion();
+
+            if (filasAfectadas > 0) {
+                System.out.println("Seguro agregado correctamente.");
+                conexion.commit();
+            } else {
+                System.out.println("No se pudo agregar el seguro.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            conexion.rollback();
+        } finally {
+            conexion.cerrarConexion();
+        }
+    }
+
     
+    public ArrayList<tipoSeguros> tipos() throws SQLException {
+        return listarTiposSeguros();
+    }
+
     public ArrayList<seguros> filtrarSeguros(String tipo1) {
         ArrayList<seguros> listaSeguros = new ArrayList<>();
         try {
@@ -106,6 +127,4 @@ public class SegurosDAO {
         }
         return listaSeguros;
     }
-    
-    
 }
