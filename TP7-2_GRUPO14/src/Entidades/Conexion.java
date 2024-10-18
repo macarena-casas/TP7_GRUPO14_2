@@ -86,7 +86,7 @@ public class Conexion {
 
     public int ejecutarAccion() throws SQLException {
         if (comando == null) {
-            throw new SQLException("El comando no ha sido inicializado. Asegúrate de llamar a setearConsulta() primero.");
+            throw new SQLException("El comando no ha sido inicializado.");
         }
         int filasAfectadas = 0;
         try {
